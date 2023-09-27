@@ -95,11 +95,11 @@ ROLLBACK;
 --------------------------------------------------------------------------------
 
 CREATE TABLE DEPTS AS (SELECT * FROM departments);
-  
-INSERT INTO depts 
-VALUES (280, '개발', null, 1800);
-INSERT INTO depts 
-VALUES (290, '회계', null, 1800);
+-- 1  
+INSERT INTO depts (department_id, department_name, location_id)
+VALUES (280, '개발', 1800);
+INSERT INTO depts (department_id, department_name, location_id)
+VALUES (290, '회계', 1800);
 INSERT INTO depts 
 VALUES (300, '재정', 301, 1800);
 INSERT INTO depts 
@@ -121,19 +121,17 @@ WHERE department_name = 'IT Helpdesk';
 -- 2-4
 UPDATE depts SET manager_id = 301
 WHERE department_name IN ('회계', '재정', '인사', '영업');
-
 -- 3
 DELETE FROM depts
 WHERE department_id IN (SELECT department_id FROM depts
                         WHERE department_name IN('영업', 'NOC'));
-
 -- 4-1
 DELETE FROM depts
 WHERE department_id > 200;
 -- 4-2
 UPDATE depts SET manager_id = 100
 WHERE manager_id IS NOT NULL;
--- 4-3,4
+-- 4-4
 MERGE INTO depts a
     USING 
         (SELECT * FROM departments) b
@@ -160,12 +158,12 @@ INSERT INTO jobs_it
 VALUES ('NET_DEV', '네트워크개발팀', 5000, 20000);
 INSERT INTO jobs_it
 VALUES ('SEC_DEV', '보안개발팀', 6000, 19000);
--- 5-3,4
+-- 5-4
 MERGE INTO jobs_it a
     USING
-        (SELECT * FROM jobs) b
+        (SELECT * FROM jobs WHERE min_salary > 5000) b
     ON
-        (a.job_id = b.job_id AND b.min_salary > 5000)
+        (a.job_id = b.job_id)
 WHEN MATCHED THEN
     UPDATE SET
         a.min_salary = b.min_salary,
